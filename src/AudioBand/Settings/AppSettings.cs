@@ -46,11 +46,11 @@ namespace AudioBand.Settings
             AudioBandSettings = settings.AudioBandSettings ?? new AudioBandSettings();
 
             CheckAndLoadProfiles(settings, _persistSettings.ReadProfiles().ToArray());
+            AudioBandSettings.LastKnownVersion = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? AudioBandSettings.LastKnownVersion;
+
             var profileName = AudioBandSettings.UseAutomaticIdleProfile && !string.IsNullOrEmpty(AudioBandSettings.LastNonIdleProfileName)
                             ? AudioBandSettings.LastNonIdleProfileName : settings.CurrentProfileName;
             SelectProfile(profileName);
-
-            AudioBandSettings.LastKnownVersion = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
         }
 
         /// <inheritdoc />

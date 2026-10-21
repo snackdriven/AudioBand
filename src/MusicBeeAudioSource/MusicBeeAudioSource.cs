@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -190,6 +190,13 @@ namespace MusicBeeAudioSource
             {
                 if (Process.GetProcessesByName("MusicBee").Length == 0)
                 {
+                    if (_isPlaying)
+                    {
+                        _isPlaying = false;
+                        IsPlayingChanged?.Invoke(this, false);
+                    }
+
+                    _currentId = null;
                     return;
                 }
 
@@ -324,6 +331,11 @@ namespace MusicBeeAudioSource
         private TimeSpan ParseTimeFromIPC()
         {
             var timeString = _ipc.GetFileProperty(MusicBeeIPC.FileProperty.Duration);
+            if (string.IsNullOrWhiteSpace(timeString))
+            {
+                return TimeSpan.Zero;
+            }
+
             var times = timeString.Split(':');
 
             switch (times.Length)

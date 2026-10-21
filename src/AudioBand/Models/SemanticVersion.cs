@@ -23,23 +23,32 @@ namespace AudioBand.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="SemanticVersion"/> class.
         /// </summary>
-        /// <param name="version">Version in format v1.0.0.</param>
+        /// <param name="version">Version in format v1.0.0 or 1.0.0.</param>
         public SemanticVersion(string version)
         {
-            var regex = Regex.Match(version, "\\d+\\.\\d+\\.\\d+");
-
-            if (!regex.Success)
+            if (string.IsNullOrWhiteSpace(version))
             {
                 ParseFailed = true;
                 return;
             }
 
-            version = version.StartsWith("v") ? version.Remove(0, 1) : version;
-            var splits = version.Split('.');
+            var regex = Regex.Match(
+                version,
+                @"(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<prerelease>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+(?<build>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?");
 
-            Major = int.Parse(splits[0]);
-            Minor = int.Parse(splits[1]);
-            Patch = int.Parse(splits[2]);
+            if (!regex.Success
+                || !int.TryParse(regex.Groups["major"].Value, out var major)
+                || !int.TryParse(regex.Groups["minor"].Value, out var minor)
+                || !int.TryParse(regex.Groups["patch"].Value, out var patch))
+            {
+                ParseFailed = true;
+                return;
+            }
+
+            Major = major;
+            Minor = minor;
+            Patch = patch;
+            PreRelease = regex.Groups["prerelease"].Success ? regex.Groups["prerelease"].Value : null;
         }
 
         /// <summary>
@@ -58,6 +67,11 @@ namespace AudioBand.Models
         public int Patch { get; private set; } = 0;
 
         /// <summary>
+        /// Gets the optional pre-release identifier.
+        /// </summary>
+        public string PreRelease { get; private set; }
+
+        /// <summary>
         /// Gets whether the parsing failed.
         /// </summary>
         public bool ParseFailed { get; private set; } = false;
@@ -69,9 +83,28 @@ namespace AudioBand.Models
         /// <returns>Whether or not the current version is latest.</returns>
         public bool IsNewerVersionThan(SemanticVersion other)
         {
-            return Major > other.Major
-                    || (Major == other.Major && Minor > other.Minor)
-                    || (Major == other.Major && Minor == other.Minor && Patch > other.Patch);
+            if (other == null || ParseFailed || other.ParseFailed)
+            {
+                return false;
+            }
+
+            if (Major != other.Major)
+            {
+                return Major > other.Major;
+            }
+
+            if (Minor != other.Minor)
+            {
+                return Minor > other.Minor;
+            }
+
+            if (Patch != other.Patch)
+            {
+                return Patch > other.Patch;
+            }
+
+            // Per SemVer 2.0.0 §11, a normal release has higher precedence than a pre-release version.
+            return string.IsNullOrEmpty(PreRelease) && !string.IsNullOrEmpty(other.PreRelease);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -33,8 +33,6 @@ namespace AudioBand.Settings.Persistence
             { "3", typeof(Models.V3.SettingsV3) },
             { "4", typeof(Models.V4.SettingsV4) },
         };
-
-        private PopupService _popups = PopupService.Instance;
 
         /// <inheritdoc />
         public void CheckAndConvertOldSettings()
@@ -91,7 +89,7 @@ namespace AudioBand.Settings.Persistence
 
                 if (settings == null)
                 {
-                    _popups.ShowPopup("FileCorruptedTitle", "FileCorruptedDescription", TimeSpan.FromSeconds(20));
+                    PopupService.Instance?.ShowPopup("FileCorruptedTitle", "FileCorruptedDescription", TimeSpan.FromSeconds(20));
                     throw new Exception("The setting file was null / corrupted.");
                 }
 
@@ -133,8 +131,6 @@ namespace AudioBand.Settings.Persistence
             {
                 _isBusy = false;
             }
-
-            _isBusy = false;
         }
 
         /// <inheritdoc />
@@ -174,7 +170,11 @@ namespace AudioBand.Settings.Persistence
 
                     if (loadedProfile == null)
                     {
-                        DeleteProfile(fileNames[i]);
+                        try
+                        {
+                            File.Delete(fileNames[i]);
+                        }
+                        catch (Exception) { }
                         continue;
                     }
 
@@ -205,24 +205,29 @@ namespace AudioBand.Settings.Persistence
             }
 
             _isBusy = true;
-            var profiles = userProfiles.ToArray();
-
-            for (int i = 0; i < profiles.Length; i++)
+            try
             {
-                try
-                {
-                    var json = JsonConvert.SerializeObject(profiles[i], Formatting.Indented);
-                    var path = Path.Combine(ProfilesDirectory, $"{profiles[i].Name}.profile.json");
+                var profiles = userProfiles.ToArray();
 
-                    File.WriteAllText(path, json);
-                }
-                catch (Exception e)
+                for (int i = 0; i < profiles.Length; i++)
                 {
-                    continue;
+                    try
+                    {
+                        var json = JsonConvert.SerializeObject(profiles[i], Formatting.Indented);
+                        var path = Path.Combine(ProfilesDirectory, $"{profiles[i].Name}.profile.json");
+
+                        File.WriteAllText(path, json);
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
                 }
             }
-
-            _isBusy = false;
+            finally
+            {
+                _isBusy = false;
+            }
         }
 
         /// <inheritdoc />

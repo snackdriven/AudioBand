@@ -121,5 +121,81 @@ namespace AudioBand.Test
             Assert.Equal("Idle", appSettings.CurrentProfile.Name);
             Assert.Equal("Essentials 2", appSettings.AudioBandSettings.LastNonIdleProfileName);
         }
+
+        [Theory]
+        [InlineData(null, true, 0, 0, 0, null)]
+        [InlineData("", true, 0, 0, 0, null)]
+        [InlineData("$version$", true, 0, 0, 0, null)]
+        [InlineData("1.2.6", false, 1, 2, 6, null)]
+        [InlineData("v1.2.6", false, 1, 2, 6, null)]
+        [InlineData("V1.2.6", false, 1, 2, 6, null)]
+        [InlineData("AudioBand v1.2.6", false, 1, 2, 6, null)]
+        [InlineData("v1.2.6-beta.1", false, 1, 2, 6, "beta.1")]
+        [InlineData("1.2.6-rc.2+build.42", false, 1, 2, 6, "rc.2")]
+        public void SemanticVersion_ParsesVariousInputsWithoutThrowing(
+            string input,
+            bool expectedParseFailed,
+            int expectedMajor,
+            int expectedMinor,
+            int expectedPatch,
+            string expectedPreRelease)
+        {
+            var version = new SemanticVersion(input);
+
+            Assert.Equal(expectedParseFailed, version.ParseFailed);
+            Assert.Equal(expectedMajor, version.Major);
+            Assert.Equal(expectedMinor, version.Minor);
+            Assert.Equal(expectedPatch, version.Patch);
+            Assert.Equal(expectedPreRelease, version.PreRelease);
+        }
+
+        [Fact]
+        public void SemanticVersion_IsNewerVersionThan_HandlesPreReleasesAndNullSafely()
+        {
+            var stable = new SemanticVersion("v1.2.6");
+            var prerelease = new SemanticVersion("v1.2.6-beta.1");
+            var older = new SemanticVersion("v1.2.5");
+            var invalid = new SemanticVersion((string)null);
+
+            Assert.True(stable.IsNewerVersionThan(prerelease));
+            Assert.False(prerelease.IsNewerVersionThan(stable));
+            Assert.True(prerelease.IsNewerVersionThan(older));
+            Assert.False(stable.IsNewerVersionThan(invalid));
+            Assert.False(invalid.IsNewerVersionThan(stable));
+            Assert.False(stable.IsNewerVersionThan(null));
+        }
+
+        [Fact]
+        public void AppSettings_Constructor_PersistsCurrentAssemblyVersionBeforeSaving()
+        {
+            var persistMock = new Mock<IPersistentSettings>();
+            var messageBusMock = new Mock<IMessageBus>();
+            Settings.Persistence.Settings savedSettings = null;
+
+            persistMock.Setup(x => x.ReadSettings()).Returns(new Settings.Persistence.Settings
+            {
+                CurrentProfileName = "Default Profile",
+                AudioBandSettings = new AudioBandSettings
+                {
+                    IdleProfileName = "Idle",
+                    LastNonIdleProfileName = "Default Profile",
+                    UseAutomaticIdleProfile = false,
+                    LastKnownVersion = "v1.2.5",
+                },
+            });
+            persistMock.Setup(x => x.ReadProfiles()).Returns(new[]
+            {
+                new UserProfile { Name = "Default Profile" },
+                new UserProfile { Name = "Idle" },
+            });
+            persistMock.Setup(x => x.WriteSettings(It.IsAny<Settings.Persistence.Settings>()))
+                .Callback<Settings.Persistence.Settings>(s => savedSettings = s);
+
+            var appSettings = new AppSettings(persistMock.Object, messageBusMock.Object);
+
+            Assert.NotNull(savedSettings);
+            Assert.NotEqual("v1.2.5", savedSettings.AudioBandSettings.LastKnownVersion);
+            Assert.Equal(appSettings.AudioBandSettings.LastKnownVersion, savedSettings.AudioBandSettings.LastKnownVersion);
+        }
     }
 }

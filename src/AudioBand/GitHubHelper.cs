@@ -53,7 +53,7 @@ namespace AudioBand
         public async Task<string> GetLatestDownloadUrlAsync()
         {
             var release = await GetLatestRelease();
-            return release.Assets.FirstOrDefault(x => x.Name == "AudioBand.msi")?.BrowserDownloadUrl;
+            return release?.Assets?.FirstOrDefault(x => x.Name == "AudioBand.msi")?.BrowserDownloadUrl;
         }
 
         /// <summary>
@@ -64,16 +64,21 @@ namespace AudioBand
         {
             try
             {
-                var currentVersion = GetType().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
-                string latestVersion = "";
-
-                latestVersion = (await GetLatestRelease()).Name.Split(' ')[1];
+                var currentVersion = GetType().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
                 // custom build or forgot to change version on compile, exclude from updates
-                if (currentVersion == "$version$")
+                if (string.IsNullOrEmpty(currentVersion) || currentVersion == "$version$")
                 {
                     return true;
                 }
+
+                var release = await GetLatestRelease();
+                if (release == null)
+                {
+                    return true;
+                }
+
+                var latestVersion = !string.IsNullOrWhiteSpace(release.TagName) ? release.TagName : release.Name;
 
                 var current = new SemanticVersion(currentVersion);
                 var latest = new SemanticVersion(latestVersion);

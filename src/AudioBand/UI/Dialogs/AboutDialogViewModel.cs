@@ -1,4 +1,4 @@
-﻿using AudioBand.Commands;
+using AudioBand.Commands;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -15,7 +15,19 @@ namespace AudioBand.UI
         /// <summary>
         /// Gets the current audioband version.
         /// </summary>
-        public string Version => GetType().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+        public string Version
+        {
+            get
+            {
+                var infoVersion = GetType().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+                if (string.IsNullOrWhiteSpace(infoVersion))
+                {
+                    return "v0.0.0";
+                }
+
+                return infoVersion.StartsWith("v", StringComparison.OrdinalIgnoreCase) ? infoVersion : $"v{infoVersion}";
+            }
+        }
 
         /// <summary>
         /// Gets the link to the project.

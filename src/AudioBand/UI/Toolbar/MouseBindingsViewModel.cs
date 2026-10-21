@@ -240,10 +240,22 @@ namespace AudioBand.UI
 
                     break;
                 case MouseBindingCommandType.Skip15Seconds:
-                    _audioSession.CurrentAudioSource?.SetPlaybackProgressAsync(_audioSession.SongProgress.Add(TimeSpan.FromSeconds(15)));
+                    var skipTarget = _audioSession.SongProgress.Add(TimeSpan.FromSeconds(15));
+                    if (_audioSession.SongLength > TimeSpan.Zero && skipTarget > _audioSession.SongLength)
+                    {
+                        skipTarget = _audioSession.SongLength;
+                    }
+
+                    _audioSession.CurrentAudioSource?.SetPlaybackProgressAsync(skipTarget);
                     break;
                 case MouseBindingCommandType.Rewind15Seconds:
-                    _audioSession.CurrentAudioSource?.SetPlaybackProgressAsync(_audioSession.SongProgress.Add(TimeSpan.FromSeconds(-15)));
+                    var rewindTarget = _audioSession.SongProgress.Add(TimeSpan.FromSeconds(-15));
+                    if (rewindTarget < TimeSpan.Zero)
+                    {
+                        rewindTarget = TimeSpan.Zero;
+                    }
+
+                    _audioSession.CurrentAudioSource?.SetPlaybackProgressAsync(rewindTarget);
                     break;
                 default:
                     break;
@@ -257,7 +269,9 @@ namespace AudioBand.UI
                 return;
             }
 
-            var windowPtr = NativeMethods.FindWindow(_audioSession.CurrentAudioSource.WindowClassName, null);
+            var windowPtr = !string.IsNullOrEmpty(_audioSession.CurrentAudioSource.WindowClassName)
+                ? NativeMethods.FindWindow(_audioSession.CurrentAudioSource.WindowClassName, null)
+                : IntPtr.Zero;
 
             if (_audioSession.CurrentAudioSource.Name == "iTunes")
             {
@@ -276,8 +290,10 @@ namespace AudioBand.UI
                         Logger.Debug("Failed to open iTunes through path.");
                     }
                 }
-
-                windowPtr = NativeMethods.FindWindow(null, title);
+                else
+                {
+                    windowPtr = NativeMethods.FindWindow(null, title);
+                }
             }
             else if (_audioSession.CurrentAudioSource.Name == "Music Bee")
             {
@@ -296,8 +312,10 @@ namespace AudioBand.UI
                         Logger.Debug("Failed to open MusicBee through path.");
                     }
                 }
-
-                windowPtr = NativeMethods.FindWindow(null, title);
+                else
+                {
+                    windowPtr = NativeMethods.FindWindow(null, title);
+                }
             }
 
             // Spotify has some weird shenanigans with their windows, doing it like normal
@@ -320,8 +338,10 @@ namespace AudioBand.UI
                         Logger.Debug("Failed to open Spotify through path or protocol.");
                     }
                 }
-
-                windowPtr = NativeMethods.FindWindow(null, title);
+                else
+                {
+                    windowPtr = NativeMethods.FindWindow(null, title);
+                }
             }
 
             if (windowPtr == IntPtr.Zero)

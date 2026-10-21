@@ -435,6 +435,12 @@ namespace SpotifyAudioSource
         /// <inheritdoc />
         public async Task SetVolumeAsync(int newVolume)
         {
+            if (_spotifyClient == null)
+            {
+                Authorize();
+                return;
+            }
+
             if (_volumeUpdateTimer.Enabled)
             {
                 _currentVolumePercent = newVolume;
@@ -445,7 +451,15 @@ namespace SpotifyAudioSource
             _lastVolumeUpdate = DateTime.UtcNow;
 
             _currentVolumePercent = newVolume;
-            await _spotifyClient.Player.SetVolume(new PlayerVolumeRequest(newVolume));
+            try
+            {
+                await _spotifyClient.Player.SetVolume(new PlayerVolumeRequest(newVolume));
+            }
+            catch (Exception e)
+            {
+                Logger.Warn($"Something went wrong with player command [SetVolume]: {e.Message}");
+            }
+
             await Task.Delay(110).ContinueWith(async t => await UpdatePlayer());
         }
 
@@ -887,11 +901,23 @@ namespace SpotifyAudioSource
             await UpdatePlayer();
         }
 
-        private void OnVolumeUpdaterElapsed(object sender, ElapsedEventArgs e)
+        private async void OnVolumeUpdaterElapsed(object sender, ElapsedEventArgs e)
         {
             _volumeUpdateTimer.Stop();
 
-            _spotifyClient.Player.SetVolume(new PlayerVolumeRequest(_currentVolumePercent));
+            if (_spotifyClient == null)
+            {
+                return;
+            }
+
+            try
+            {
+                await _spotifyClient.Player.SetVolume(new PlayerVolumeRequest(_currentVolumePercent));
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"Something went wrong with player command [OnVolumeUpdaterElapsed]: {ex.Message}");
+            }
         }
 
         private async Task UpdatePlayer()

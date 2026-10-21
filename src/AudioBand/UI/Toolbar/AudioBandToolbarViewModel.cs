@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -149,7 +149,10 @@ namespace AudioBand.UI
             InitializeProfiles();
 
             SelectedProfile = _appSettings.CurrentProfile;
-            _appSettings.AudioBandSettings.LastNonIdleProfileName = SelectedProfile.Name;
+            if (SelectedProfile != null && SelectedProfile.Name != _appSettings.AudioBandSettings.IdleProfileName)
+            {
+                _appSettings.AudioBandSettings.LastNonIdleProfileName = SelectedProfile.Name;
+            }
 
             if (_appSettings.AudioBandSettings.UseAutomaticIdleProfile && !_audioSession.IsPlaying)
             {
@@ -240,7 +243,7 @@ namespace AudioBand.UI
         {
             if (msg == ProfilesUpdatedMessage.ProfileSelected)
             {
-                Logger.Info($"Switching from profile \"{SelectedProfile.Name}\" to \"{_appSettings.CurrentProfile.Name}\"");
+                Logger.Info($"Switching from profile \"{SelectedProfile?.Name}\" to \"{_appSettings.CurrentProfile?.Name}\"");
 
                 SelectedProfile = _appSettings.CurrentProfile;
                 return;
