@@ -23,6 +23,10 @@ namespace AudioBand
     public class GitHubHelper
     {
         private const string OrganizationName = "AudioBand";
+
+        // Releases come from this fork so the updater never offers an upstream MSI that would drop fork fixes.
+        private const string ReleaseOwner = "snackdriven";
+        private const string ReleaseRepository = "AudioBand";
         private const string CommunityProfilesRepository = "CommunityProfiles";
         private const string CommunityAudiosourcesRepository = "CommunityAudiosources";
 
@@ -217,8 +221,8 @@ namespace AudioBand
             try
             {
                 return _appSettings.AudioBandSettings.OptInForPreReleases
-                    ? (await _client.Repository.Release.GetAll(OrganizationName, OrganizationName))[0]
-                    : await _client.Repository.Release.GetLatest(OrganizationName, OrganizationName);
+                    ? (await _client.Repository.Release.GetAll(ReleaseOwner, ReleaseRepository))[0]
+                    : await _client.Repository.Release.GetLatest(ReleaseOwner, ReleaseRepository);
             }
             catch (Exception)
             {

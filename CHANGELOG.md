@@ -7,10 +7,22 @@ and numbered releases follow [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+## [1.2.6] - 2026-10-21
+
 ### Added
 
 - Commitizen configuration (`.cz.toml`), release workflow (`RELEASE.md`), and CI validation (`.github/workflows/release-conventions.yml`) for Conventional Commits, SemVer consistency, and curated Keep a Changelog notes.
 - Regression test coverage for `SemanticVersion` parsing (null/empty inputs, pre-release suffixes, release title prefixes) and `AppSettings` startup version persistence.
+- Regression test suite (`BugFixRegressionTests`) covering audio source switching, profile naming collisions, profile deletion fallbacks, and automatic idle profile transitions.
+
+### Changed
+
+- Pointed the in-app update check at `snackdriven/AudioBand` releases so the updater never offers an upstream installer that would drop fork fixes.
+- Bumped CI to `actions/checkout@v5` and `actions/upload-artifact@v5`, and located `vstest.console.exe` via `vswhere`.
+- Updated Spotify OAuth redirect URI to `http://127.0.0.1:<CallbackPort>/callback` (default port `8888`) to comply with Spotify's April/November 2025 redirect URI security requirements.
+- Configured `SpotifyClient` with `AuthorizationCodeAuthenticator` so hourly OAuth access tokens refresh automatically without re-opening the browser.
+- Prioritized `Spotify client ID` and `Spotify client secret` settings ahead of `Spotify RefreshToken` during startup settings hydration.
+- Replaced hardcoded Visual Studio 2019 CI paths in `.github/workflows/cicd.yml` with `actions/checkout@v4`, `microsoft/setup-msbuild@v2`, `NuGet/setup-nuget@v2`, and `vstest.console.exe`.
 
 ### Fixed
 
@@ -21,22 +33,6 @@ and numbered releases follow [Semantic Versioning](https://semver.org/spec/v2.0.
 - Fixed `PersistentSettings` popup singleton access on corrupted `settings.json`, invalid profile file deletion path handling, and `_isBusy` reset in `WriteProfiles`.
 - Clamped 15-second skip/rewind mouse bindings to valid `[0, SongLength]` bounds and avoided `FindWindow(null, null)` calls when launching an unstarted media player.
 - Guarded `SpotifyAudioSource` volume updates when the API client is uninitialized or offline, and cleared `MusicBeeAudioSource` playback state when MusicBee exits.
-
-## [1.2.6] - 2026-10-21
-
-### Added
-
-- Regression test suite (`BugFixRegressionTests`) covering audio source switching, profile naming collisions, profile deletion fallbacks, and automatic idle profile transitions.
-
-### Changed
-
-- Updated Spotify OAuth redirect URI to `http://127.0.0.1:<CallbackPort>/callback` (default port `8888`) to comply with Spotify's April/November 2025 redirect URI security requirements.
-- Configured `SpotifyClient` with `AuthorizationCodeAuthenticator` so hourly OAuth access tokens refresh automatically without re-opening the browser.
-- Prioritized `Spotify client ID` and `Spotify client secret` settings ahead of `Spotify RefreshToken` during startup settings hydration.
-- Replaced hardcoded Visual Studio 2019 CI paths in `.github/workflows/cicd.yml` with `actions/checkout@v4`, `microsoft/setup-msbuild@v2`, `NuGet/setup-nuget@v2`, and `vstest.console.exe`.
-
-### Fixed
-
 - Recovered from revoked or expired Spotify refresh tokens (`invalid_grant` / `invalid_client`) by clearing the stale token and initiating a fresh OAuth flow, with a 30-second backoff when offline.
 - Fixed Spotify podcast episode playback (`ItemType.Episode`) overwriting `_currentItemIsTrack` or calling `Library.CheckTracks` on episode IDs.
 - Fixed `SpotifyControls` desktop window resolution for modern Chromium-based Spotify builds (`Chrome_WidgetWin_0` / `Chrome_WidgetWin_1`).
@@ -52,6 +48,6 @@ and numbered releases follow [Semantic Versioning](https://semver.org/spec/v2.0.
 
 - Updated Spotify local authentication address handling in preparation for `localhost` redirect deprecation.
 
-[Unreleased]: https://github.com/snackdriven/AudioBand/compare/8047220...HEAD
-[1.2.6]: https://github.com/snackdriven/AudioBand/commits/8047220
+[Unreleased]: https://github.com/snackdriven/AudioBand/compare/v1.2.6...HEAD
+[1.2.6]: https://github.com/snackdriven/AudioBand/releases/tag/v1.2.6
 [1.2.5]: https://github.com/AudioBand/AudioBand/releases/tag/v1.2.5
