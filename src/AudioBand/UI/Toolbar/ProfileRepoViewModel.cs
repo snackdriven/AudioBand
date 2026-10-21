@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -138,16 +138,22 @@ namespace AudioBand.UI
         private async Task OnInstallProfileCommandExecuted(string profileName)
         {
             IsDownloading = true;
-            var communityProfile = AvailableProfiles.FirstOrDefault(x => x.Name == profileName);
-
-            if (communityProfile == null || communityProfile.IsInstalled)
+            try
             {
-                return;
-            }
+                var communityProfile = AvailableProfiles.FirstOrDefault(x => x.Name == profileName);
 
-            await InstallProfileAsync(communityProfile);
-            ForceUpdateCollection();
-            IsDownloading = false;
+                if (communityProfile == null || communityProfile.IsInstalled)
+                {
+                    return;
+                }
+
+                await InstallProfileAsync(communityProfile);
+                ForceUpdateCollection();
+            }
+            finally
+            {
+                IsDownloading = false;
+            }
         }
 
         private async Task OnUpdateProfileCommandExecuted(string profileName)

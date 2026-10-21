@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -134,10 +134,17 @@ namespace AudioBand.UI
         private void SetupLabels()
         {
             // required to modify collection created on UI thread.
-            Application.Current.Dispatcher.Invoke(delegate
+            if (Application.Current?.Dispatcher != null)
+            {
+                Application.Current.Dispatcher.Invoke(delegate
+                {
+                    CustomLabels.Clear();
+                });
+            }
+            else
             {
                 CustomLabels.Clear();
-            });
+            }
 
             if (_appsettings.CurrentProfile.CustomLabels == null || _appsettings.CurrentProfile.CustomLabels.Count == 0)
             {
@@ -148,10 +155,17 @@ namespace AudioBand.UI
 
             for (int i = 0; i < customLabels.Length; i++)
             {
-                Application.Current.Dispatcher.Invoke(delegate
+                if (Application.Current?.Dispatcher != null)
+                {
+                    Application.Current.Dispatcher.Invoke(delegate
+                    {
+                        CustomLabels.Add(customLabels[i]);
+                    });
+                }
+                else
                 {
                     CustomLabels.Add(customLabels[i]);
-                });
+                }
             }
         }
 

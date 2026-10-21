@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup Condition="Exists('$(UserProfile)\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\Microsoft.NETFramework.ReferenceAssemblies.net48.targets')">
+    <TargetFrameworkRootPath>$(UserProfile)\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\</TargetFrameworkRootPath>
+    <EnableFrameworkPathOverride>false</EnableFrameworkPathOverride>
+  </PropertyGroup>
+  <ItemGroup Condition="('$(MSBuildProjectExtension)' == '.csproj') And !$(MSBuildProjectName.EndsWith('_wpftmp'))">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

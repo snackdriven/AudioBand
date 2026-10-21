@@ -1,4 +1,4 @@
-﻿using AudioBand.AudioSource;
+using AudioBand.AudioSource;
 using AudioBand.Messages;
 using AudioBand.Models;
 using AudioBand.Settings;
@@ -24,12 +24,6 @@ namespace AudioBand.Test
 
         public CustomLabelsViewModelTests()
         {
-            // Initialize our app (necessary because of Application.Current.Dispatcher in CustomLabelsViewModel#SetupLabels)
-            if (System.Windows.Application.Current == null)
-            {
-                new System.Windows.Application { ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown };
-            }
-
             _dialogMock = new Mock<IDialogService>();
             _appSettingsMock = new Mock<IAppSettings>();
             _appSettingsMock.Setup(x => x.CurrentProfile).Returns(new UserProfile() { CustomLabels = new List<CustomLabel>() });

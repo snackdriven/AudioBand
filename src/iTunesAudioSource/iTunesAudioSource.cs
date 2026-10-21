@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -266,6 +266,7 @@ namespace iTunesAudioSource
                 NotifyPlayerState();
                 NotifyVolume();
                 NotifyShuffle();
+                NotifyRepeatMode();
                 NotifyLike();
                 if (IsNewTrack(track))
                 {

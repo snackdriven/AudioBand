@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Timers;
 using AudioBand.Settings;
@@ -53,8 +53,9 @@ namespace AudioBand.AudioSource
                     return;
                 }
 
+                var oldAudioSource = _currentAudioSource;
                 _currentAudioSource = value;
-                AudioSourceChanged();
+                AudioSourceChanged(oldAudioSource);
             }
         }
 
@@ -135,18 +136,18 @@ namespace AudioBand.AudioSource
             set => SetProperty(ref _isLiked, value);
         }
 
-        private void AudioSourceChanged()
+        private void AudioSourceChanged(IInternalAudioSource oldAudioSource)
         {
-            if (_currentAudioSource != null)
+            if (oldAudioSource != null)
             {
                 ClearSession();
-                _currentAudioSource.TrackInfoChanged -= AudioSourceOnTrackInfoChanged;
-                _currentAudioSource.IsPlayingChanged -= AudioSourceOnIsPlayingChanged;
-                _currentAudioSource.TrackProgressChanged -= AudioSourceOnTrackProgressChanged;
-                _currentAudioSource.RepeatModeChanged -= AudioSourceOnRepeatModeChanged;
-                _currentAudioSource.ShuffleChanged -= AudioSourceOnShuffleChanged;
-                _currentAudioSource.VolumeChanged -= AudioSourceVolumeChanged;
-                _currentAudioSource.LikeChanged -= AudioSourceLikeChanged;
+                oldAudioSource.TrackInfoChanged -= AudioSourceOnTrackInfoChanged;
+                oldAudioSource.IsPlayingChanged -= AudioSourceOnIsPlayingChanged;
+                oldAudioSource.TrackProgressChanged -= AudioSourceOnTrackProgressChanged;
+                oldAudioSource.RepeatModeChanged -= AudioSourceOnRepeatModeChanged;
+                oldAudioSource.ShuffleChanged -= AudioSourceOnShuffleChanged;
+                oldAudioSource.VolumeChanged -= AudioSourceVolumeChanged;
+                oldAudioSource.LikeChanged -= AudioSourceLikeChanged;
             }
 
             if (_currentAudioSource == null)

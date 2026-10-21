@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -12,7 +12,7 @@ namespace AudioBand
         public delegate IntPtr CallWndProc(int nCode, IntPtr wParam, IntPtr lParam);
 
         [DllImport("user32", EntryPoint = "SetWindowsHookExA")]
-        public static extern IntPtr SetWindowsHookEx(int idHook, CallWndProc lpfn, IntPtr hmod, IntPtr dwThreadId);
+        public static extern IntPtr SetWindowsHookEx(int idHook, CallWndProc lpfn, IntPtr hmod, uint dwThreadId);
 
         [DllImport("user32", EntryPoint = "UnhookWindowsHookEx")]
         public static extern IntPtr UnhookWindowsHookEx(IntPtr hHook);
@@ -21,7 +21,7 @@ namespace AudioBand
         public static extern IntPtr CallNextHook(IntPtr hHook, int ncode, IntPtr wParam, IntPtr lParam);
 
         [DllImport("user32")]
-        public static extern IntPtr GetWindowThreadProcessId(IntPtr hWnd, IntPtr processId);
+        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr processId);
 
         [DllImport("user32")]
         public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);

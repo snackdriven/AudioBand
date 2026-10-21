@@ -285,7 +285,7 @@ namespace AudioBand.UI
 
         private void VolumeMouseScrollCommandOnExecute(MouseWheelEventArgs args)
         {
-            Volume += args.Delta / 75;
+            Volume = Math.Max(0, Math.Min(100, Volume + (args.Delta / 75)));
         }
 
         private void InitializeButtonContents()

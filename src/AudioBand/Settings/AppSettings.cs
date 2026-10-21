@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -82,7 +82,8 @@ namespace AudioBand.Settings
             CurrentProfile = _profiles[profileName];
             ProfileChanged?.Invoke(this, EventArgs.Empty);
 
-            if (!string.IsNullOrEmpty(CurrentProfile?.Name))
+            if (!string.IsNullOrEmpty(CurrentProfile?.Name)
+                && (!AudioBandSettings.UseAutomaticIdleProfile || CurrentProfile.Name != AudioBandSettings.IdleProfileName))
             {
                 AudioBandSettings.LastNonIdleProfileName = CurrentProfile.Name;
             }
@@ -137,6 +138,8 @@ namespace AudioBand.Settings
                 throw new ArgumentException($"Profile {profileName} does not exist", nameof(profileName));
             }
 
+            _profiles.Remove(profileName);
+
             if (AudioBandSettings.IdleProfileName == profileName)
             {
                 AudioBandSettings.UseAutomaticIdleProfile = false;
@@ -148,7 +151,6 @@ namespace AudioBand.Settings
                 AudioBandSettings.LastNonIdleProfileName = _profiles.First().Key;
             }
 
-            _profiles.Remove(profileName);
             _persistSettings.DeleteProfile(profileName);
         }
 

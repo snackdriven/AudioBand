@@ -1,4 +1,4 @@
-﻿using AudioBand.AudioSource;
+using AudioBand.AudioSource;
 using AudioBand.Messages;
 using AudioBand.Models;
 using AudioBand.Settings;
@@ -23,7 +23,7 @@ namespace AudioBand.Test
             // Initialize our app (necessary because of Application.Current.Dispatcher in CustomLabelsViewModel#SetupLabels)
             if (System.Windows.Application.Current == null)
             {
-                new System.Windows.Application { ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown };
+                // No-op: CustomLabelsViewModel handles null Application.Current in unit tests
             }
 
             _appSettings = new Mock<IAppSettings>();

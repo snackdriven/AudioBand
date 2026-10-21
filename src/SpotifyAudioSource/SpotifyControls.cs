@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 
 namespace SpotifyAudioSource
@@ -51,7 +51,7 @@ namespace SpotifyAudioSource
 
         public bool TryPlay()
         {
-            if (_spotifyHwnd == IntPtr.Zero)
+            if (!EnsureSpotifyHandle())
             {
                 return false;
             }
@@ -62,7 +62,7 @@ namespace SpotifyAudioSource
 
         public bool TryPause()
         {
-            if (_spotifyHwnd == IntPtr.Zero)
+            if (!EnsureSpotifyHandle())
             {
                 return false;
             }
@@ -73,7 +73,7 @@ namespace SpotifyAudioSource
 
         public bool TryPrevious()
         {
-            if (_spotifyHwnd == IntPtr.Zero)
+            if (!EnsureSpotifyHandle())
             {
                 return false;
             }
@@ -84,7 +84,7 @@ namespace SpotifyAudioSource
 
         public bool TryNext()
         {
-            if (_spotifyHwnd == IntPtr.Zero)
+            if (!EnsureSpotifyHandle())
             {
                 return false;
             }
@@ -105,6 +105,16 @@ namespace SpotifyAudioSource
             NativeMethods.GetWindowText(hwnd, title, title.Capacity);
 
             return title.ToString();
+        }
+
+        private bool EnsureSpotifyHandle()
+        {
+            if (_spotifyHwnd == IntPtr.Zero || GetTitle(_spotifyHwnd).Length == 0)
+            {
+                GetSpotifyWindowTitle();
+            }
+
+            return _spotifyHwnd != IntPtr.Zero;
         }
     }
 }

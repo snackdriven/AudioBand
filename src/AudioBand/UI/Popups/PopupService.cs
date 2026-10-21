@@ -60,6 +60,7 @@ namespace AudioBand.UI
             if (!_textParts.Contains(title) || !_textParts.Contains(description))
             {
                 _viewModels.PopupViewModel.ActivateNewPopup("Text Error", $"The keys '{title}' and/or '{description}' could not be found in Strings.xaml. (Notify a developer)", duration);
+                return;
             }
 
             _viewModels.PopupViewModel.ActivateNewPopup(_textParts[title].ToString(), _textParts[description].ToString(), duration);

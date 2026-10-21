@@ -2,9 +2,9 @@ name: .NET
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ master ]
+    branches: [ main, master ]
 
 jobs:
   build:
@@ -12,20 +12,23 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       name: Checkout Code
 
     - name: Setup MSBuild Path
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v2
 
     - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.5
+      uses: NuGet/setup-nuget@v2
 
     - name: Restore NuGet Packages
       run: nuget restore src/AudioBand.sln
 
     - name: Build and Publish App
       run: msbuild src/AudioBand.sln /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=FolderProfile
+
+    - name: Run Unit Tests
+      run: vstest.console.exe src/AudioBand.Test/bin/Release/AudioBand.Test.dll
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4

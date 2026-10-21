@@ -210,6 +210,8 @@ namespace AudioBand.UI
         protected override void OnEndEdit()
         {
             base.OnEndEdit();
+            _model.LastNonIdleProfileName = _appSettings.AudioBandSettings.LastNonIdleProfileName;
+            _model.MouseBindings = _appSettings.AudioBandSettings.MouseBindings;
             MapSelf(_model, _appSettings.AudioBandSettings);
         }
 
@@ -231,20 +233,23 @@ namespace AudioBand.UI
         {
             try
             {
-                _fileName = Path.GetTempFileName().Replace(".tmp", ".msi");
+                _fileName = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + ".msi");
 
-                using (var client = new WebClient())
+                var client = new WebClient();
+                client.DownloadProgressChanged += OnDownloadProgressChanged;
+                client.DownloadFileCompleted += (sender, args) =>
                 {
-                    client.DownloadProgressChanged += OnDownloadProgressChanged;
-                    client.DownloadFileCompleted += OnDownloadCompleted;
+                    client.Dispose();
+                    OnDownloadCompleted(sender, args);
+                };
 
-                    IsDownloading = true;
-                    var link = new Uri(await _gitHubHelper.GetLatestDownloadUrlAsync());
-                    client.DownloadFileAsync(link, _fileName);
-                }
+                IsDownloading = true;
+                var link = new Uri(await _gitHubHelper.GetLatestDownloadUrlAsync());
+                client.DownloadFileAsync(link, _fileName);
             }
             catch (Exception e)
             {
+                IsDownloading = false;
                 Logger.Info(e.Message);
                 Logger.Error(e);
             }
@@ -259,13 +264,19 @@ namespace AudioBand.UI
                 return;
             }
 
+            if (e.Error != null)
+            {
+                Logger.Error(e.Error);
+                return;
+            }
+
             try
             {
                 var p = Process.Start(new ProcessStartInfo()
                 {
                     FileName = "msiexec",
-                    WorkingDirectory = @"C:\temp\",
-                    Arguments = $"/i {_fileName}",
+                    WorkingDirectory = Path.GetTempPath(),
+                    Arguments = $"/i \"{_fileName}\"",
                     Verb = "Runas",
                 });
             }

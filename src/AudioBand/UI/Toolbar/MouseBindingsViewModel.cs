@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -220,10 +220,10 @@ namespace AudioBand.UI
                     _audioSession.CurrentAudioSource?.SetShuffleAsync(!_audioSession.IsShuffleOn);
                     break;
                 case MouseBindingCommandType.VolumeHigher:
-                    _audioSession.CurrentAudioSource?.SetVolumeAsync(_audioSession.Volume + 2);
+                    _audioSession.CurrentAudioSource?.SetVolumeAsync(Math.Min(100, _audioSession.Volume + 2));
                     break;
                 case MouseBindingCommandType.VolumeLower:
-                    _audioSession.CurrentAudioSource?.SetVolumeAsync(_audioSession.Volume - 2);
+                    _audioSession.CurrentAudioSource?.SetVolumeAsync(Math.Max(0, _audioSession.Volume - 2));
                     break;
                 case MouseBindingCommandType.OpenAssociatedApp:
                     OpenAssociatedApp();

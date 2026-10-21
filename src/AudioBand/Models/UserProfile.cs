@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Windows.Media;
 
 namespace AudioBand.Models
@@ -716,7 +716,7 @@ namespace AudioBand.Models
             int count = 0;
             while (profileNames.Contains(newName))
             {
-                newName += count;
+                newName = $"{name} {++count}";
             }
 
             return newName;

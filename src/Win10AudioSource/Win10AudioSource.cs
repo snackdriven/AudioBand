@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
@@ -77,7 +77,6 @@ namespace Win10AudioSource
         /// <inheritdoc />
         public async Task ActivateAsync()
         {
-            _checkTimer.Start();
             if (!ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 7))
             {
                 Logger.Info("Audio source only available on windows 10 1809 and later");
@@ -86,6 +85,7 @@ namespace Win10AudioSource
 
             _mtcManager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
             await UpdateSession(_mtcManager.GetCurrentSession());
+            _checkTimer.Start();
         }
 
         /// <inheritdoc />
@@ -198,6 +198,11 @@ namespace Win10AudioSource
 
         private void OnTimerElapsed(object sender, ElapsedEventArgs e)
         {
+            if (_mtcManager == null)
+            {
+                return;
+            }
+
             var session = _mtcManager.GetCurrentSession();
 
             UpdateSession(session).GetAwaiter().GetResult();
@@ -244,8 +249,21 @@ namespace Win10AudioSource
 
         private async Task UpdateSession(GlobalSystemMediaTransportControlsSession newSession)
         {
+            if (newSession?.SourceAppUserModelId == _currentSession?.SourceAppUserModelId)
+            {
+                if (_currentSession != null)
+                {
+                    await UpdateMediaProperties();
+                    UpdateTimelineProperties();
+                    UpdatePlaybackProperties();
+                }
+
+                return;
+            }
+
             UnsubscribeFromSession();
             _currentSession = newSession;
+            _lastProperties = null;
 
             await UpdateMediaProperties();
             UpdateTimelineProperties();
@@ -285,6 +303,10 @@ namespace Win10AudioSource
             }
 
             var mediaProperties = await _currentSession.TryGetMediaPropertiesAsync();
+            if (mediaProperties == null)
+            {
+                return;
+            }
 
             if (mediaProperties.Title == _lastProperties?.Title && mediaProperties.Artist == _lastProperties?.Artist)
             {

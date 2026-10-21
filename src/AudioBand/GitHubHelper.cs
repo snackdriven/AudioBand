@@ -194,11 +194,11 @@ namespace AudioBand
                         continue;
                     }
 
-                    client.DownloadFileAsync(new Uri(files[i].DownloadUrl), downloadPath);
+                    await client.DownloadFileTaskAsync(new Uri(files[i].DownloadUrl), downloadPath);
                 }
                 else if (files[i].Type == ContentType.Dir)
                 {
-                    var newAssetsUrl = Path.Combine(assetsUrl, files[i].Name);
+                    var newAssetsUrl = $"{assetsUrl.TrimEnd('/')}/{files[i].Name}";
                     var subFolder = await _client.Repository.Content.GetAllContents(OrganizationName, CommunityProfilesRepository, newAssetsUrl);
                     var directory = Path.Combine(assetsFolderPath, files[i].Name);
 
