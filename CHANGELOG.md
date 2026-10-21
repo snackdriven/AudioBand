@@ -52,6 +52,6 @@ and numbered releases follow [Semantic Versioning](https://semver.org/spec/v2.0.
 
 - Updated Spotify local authentication address handling in preparation for `localhost` redirect deprecation.
 
-[Unreleased]: https://github.com/snackdriven/AudioBand/compare/v1.2.6...HEAD
-[1.2.6]: https://github.com/snackdriven/AudioBand/compare/v1.1.4...v1.2.6
-[1.2.5]: https://github.com/snackdriven/AudioBand/compare/v1.1.4...v1.2.5
+[Unreleased]: https://github.com/snackdriven/AudioBand/compare/8047220...HEAD
+[1.2.6]: https://github.com/snackdriven/AudioBand/commits/8047220
+[1.2.5]: https://github.com/AudioBand/AudioBand/releases/tag/v1.2.5
