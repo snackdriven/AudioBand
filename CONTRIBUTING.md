@@ -21,4 +21,7 @@ The development documentation is a bit bare-bones at the moment, but it might be
 There are instructions on how to get started developing, how to debug and a brief overview of the project's layout.  
 If you need any help while developing something, feel free to ask for it in either a PR/draft or in the Discord.  
 
+## Commits, Changelog, and Versioning
+This repository uses [Conventional Commits](https://www.conventionalcommits.org/) via [Commitizen](https://commitizen-tools.github.io/commitizen/), [Semantic Versioning (SemVer 2.0.0)](https://semver.org/spec/v2.0.0.html), and a curated [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) in [CHANGELOG.md](CHANGELOG.md). See [RELEASE.md](RELEASE.md) for commit and release preparation commands.
+
 If you feel like some necessary information is missing regarding development, or anywhere, feel free to raise an issue or mention it in our [Discord](discord.gg/yWDHdH2za5).

@@ -1,0 +1,129 @@
+name: Release conventions
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+  push:
+    tags: ['v*']
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  normalize-title:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      pull-requests: write
+    outputs:
+      title: ${{ steps.title.outputs.result }}
+    steps:
+      # This job only reads PR metadata; it never checks out or runs PR code.
+      - name: Normalize Jules PR title
+        if: github.event_name == 'pull_request'
+        id: title
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          result-encoding: string
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              ...context.repo, pull_number: context.issue.number,
+            });
+            const conventional = /^(build|bump|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\(\S+\))?!?: [^\r\n]+$/;
+            if (conventional.test(pr.title)) return pr.title;
+            const sameRepo = pr.head.repo?.full_name === `${context.repo.owner}/${context.repo.repo}`;
+            const jules = /^jules[-/]/i.test(pr.head.ref)
+              || /PR created automatically by Jules for task\s*\[[^\]]+\]\(https:\/\/jules\.google\.com\/task\/\d+\)/i.test(pr.body || "")
+              || pr.user.login === "google-labs-jules[bot]";
+            if (!sameRepo || !jules) return pr.title;
+            const original = pr.title;
+            let description = original.replace(/^[^\p{L}\p{N}\[]+/u, "").trim();
+            description = description.replace(/^\[(?:performance improvement|code health improvement|security improvement|testing improvement)\]\s*/i, "");
+            let title = description;
+            if (!conventional.test(title)) {
+              let type = "chore";
+              if (/⚡|performance improvement/i.test(original) || /^(optimi[sz]e|speed up)\b/i.test(description)) type = "perf";
+              else if (/🧪|testing improvement/i.test(original) || /\btests?\b/i.test(description)) type = "test";
+              else if (/🧹|code health improvement/i.test(original) || /^refactor\b/i.test(description)) type = "refactor";
+              else if (/🔒|🐛|security improvement/i.test(original) || /^fix\b/i.test(description)) type = "fix";
+              else if (/📝/.test(original) || /^(document|docs)\b/i.test(description)) type = "docs";
+              else if (/✨/.test(original)) type = "feat";
+              title = `${type}: ${description}`;
+            }
+            if (!description || !conventional.test(title)) {
+              throw new Error("Cannot normalize this Jules title; use type: description.");
+            }
+            await github.rest.pulls.update({
+              ...context.repo, pull_number: pr.number, title,
+            });
+            core.info("Normalized Jules PR title to Conventional Commits.");
+            return title;
+  release-policy:
+    needs: normalize-title
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Install Commitizen
+        run: python -m pip install commitizen==4.19.2
+      - name: Test Jules title normalization
+        run: node --test .github/tests/jules-pr-titles.check.cjs
+      - name: Check squash commit title
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ needs.normalize-title.outputs.title }}
+        run: |
+          cz check --message "$PR_TITLE"
+      - name: Validate SemVer and curated changelog
+        shell: python
+        run: |
+          import datetime, json, os, pathlib, re, subprocess, tomllib
+          config = tomllib.loads(pathlib.Path(".cz.toml").read_text())["tool"]["commitizen"]
+          version = (json.loads(pathlib.Path("package.json").read_text())["version"]
+                     if config.get("version_provider") == "npm" else config["version"])
+          number = r"(?:0|[1-9][0-9]*)"
+          identifier = r"(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)"
+          semver = rf"{number}\.{number}\.{number}(?:-{identifier}(?:\.{identifier})*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?"
+          assert re.fullmatch(semver, version), f"Invalid SemVer: {version}"
+          assert config["version_scheme"] == "semver2", "Use SemVer 2"
+          assert config["update_changelog_on_bump"] is False, "Keep release notes curated"
+          if config.get("version_provider") == "npm":
+              for filename in ("package-lock.json", "npm-shrinkwrap.json"):
+                  if pathlib.Path(filename).exists():
+                      lock = json.loads(pathlib.Path(filename).read_text())
+                      assert lock.get("version") == version, f"{filename}: root version mismatch"
+                      if "packages" in lock:
+                          assert lock["packages"][""].get("version") == version, f"{filename}: package version mismatch"
+          text = pathlib.Path(config["changelog_file"]).read_text()
+          assert "keepachangelog.com" in text and "semver.org" in text, "Missing standards links"
+          assert len(re.findall(r"^## \[Unreleased\]$", text, re.M)) == 1, "Need one Unreleased section"
+          assert re.search(r"^## (.+)$", text, re.M).group(1) == "[Unreleased]", "Unreleased must be first"
+          pending = re.split(r"^## \[Unreleased\]\s*$", text, flags=re.M)[1]
+          pending = re.split(r"^## |^\[Unreleased\]:", pending, maxsplit=1, flags=re.M)[0]
+          categories = re.findall(r"^### (.+)$", pending, re.M)
+          assert len(categories) == len(set(categories)), "Duplicate Unreleased category"
+          assert set(categories) <= {"Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"}, "Unknown category"
+          for section in re.split(r"^### .+$", pending, flags=re.M)[1:]:
+              assert re.search(r"^- \S", section, re.M), "Empty Unreleased category"
+          seen = set()
+          for released, date in re.findall(r"^## \[([^]\n]+)\] - ([^\n]+)$", text, re.M):
+              assert re.fullmatch(semver, released), f"Invalid release version: {released}"
+              assert released not in seen, f"Duplicate release: {released}"
+              seen.add(released)
+              assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", date), f"Invalid release date: {date}"
+              datetime.date.fromisoformat(date)
+          for spec in config.get("version_files", []):
+              filename, _, pattern = spec.partition(":")
+              selected = [line for line in pathlib.Path(filename).read_text().splitlines() if not pattern or re.search(pattern, line)]
+              assert selected, f"No version lines matched in {filename}"
+              assert all(re.search(r"(?<![\w.])" + re.escape(version) + r"(?![\w.])", line) for line in selected), f"Version mismatch in {filename}"
+          if os.environ.get("GITHUB_REF_TYPE") == "tag":
+              assert os.environ["GITHUB_REF_NAME"] == f"v{version}", "Tag must match the configured version"
+              assert version in seen, "Tagged releases need dated, curated release notes"
+          print(f"Release policy valid: {version}")

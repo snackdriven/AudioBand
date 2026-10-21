@@ -88,7 +88,9 @@ vstest.console.exe src/AudioBand.Test/bin/Release/AudioBand.Test.dll
 
 ![Screenshot 3](screenshots/custom-1.png)
 
-## Original Documentation & License
+## Original Documentation, Releases & License
+- [CHANGELOG.md](CHANGELOG.md) — Curated release notes ([Keep a Changelog](https://keepachangelog.com/en/1.1.0/) & [SemVer](https://semver.org/spec/v2.0.0.html))
+- [RELEASE.md](RELEASE.md) — Commitizen, Conventional Commits, and SemVer release workflow
 - [Original AudioBand Documentation](https://audioband.github.io/AudioBand/audioband/index.html)
 - [LICENSE](LICENSE)
 - [THIRD PARTY](LICENSE-3RD-PARTY)
