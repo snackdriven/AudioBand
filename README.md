@@ -14,8 +14,8 @@ Windows taskbar music toolbar (`IDeskBand`) for Spotify, Windows 10/11 Media Con
 
 ## More Info
 
-- **[Releases & MSI Installer](https://github.com/snackdriven/AudioBand/releases)** — Download the latest `AudioBand.msi` (`v1.2.6`).
-- **[CHANGELOG.md](CHANGELOG.md)** — Full list of fixes and release history.
-- **[RELEASE.md](RELEASE.md) & [AGENTS.md](AGENTS.md)** — Build, test, SemVer, and Commitizen conventions.
-- **[Original Documentation](https://audioband.github.io/AudioBand/audioband/index.html)** — Upstream user guide and profile customization docs.
+- **[Releases & MSI Installer](https://github.com/snackdriven/AudioBand/releases):** Download the latest `AudioBand.msi` (`v1.2.6`).
+- **[CHANGELOG.md](CHANGELOG.md):** Full list of fixes and release history.
+- **[RELEASE.md](RELEASE.md) & [AGENTS.md](AGENTS.md):** Build, test, SemVer, and Commitizen conventions.
+- **[Original Documentation](https://audioband.github.io/AudioBand/audioband/index.html):** Upstream user guide and profile customization docs.
 - **[LICENSE](LICENSE)** & **[THIRD PARTY](LICENSE-3RD-PARTY)**
