@@ -199,15 +199,7 @@ namespace AudioBand
                         client.DownloadFile(new Uri(files[i].DownloadUrl), downloadPath);
                         PopupService.Instance.ShowPopup("InstallFontTitle", "InstallFontDescription");
 
-                        try
-                        {
-                            System.Security.Cryptography.X509Certificates.X509Certificate.CreateFromSignedFile(downloadPath);
-                            await Task.Delay(500).ContinueWith(x => Process.Start(downloadPath));
-                        }
-                        catch (Exception)
-                        {
-                            Logger.Warn($"Downloaded file {downloadPath} has an invalid or missing Authenticode signature. Execution aborted for security reasons.");
-                        }
+                        await Task.Delay(500).ContinueWith(x => Process.Start(downloadPath));
                         continue;
                     }
 
