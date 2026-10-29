@@ -272,6 +272,16 @@ namespace AudioBand.UI
 
             try
             {
+                System.Security.Cryptography.X509Certificates.X509Certificate.CreateFromSignedFile(_fileName);
+            }
+            catch (Exception exc)
+            {
+                Logger.Warn($"Downloaded update file {_fileName} has an invalid or missing Authenticode signature. Execution aborted for security reasons.");
+                return;
+            }
+
+            try
+            {
                 var p = Process.Start(new ProcessStartInfo()
                 {
                     FileName = "msiexec",
