@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Timers;
+using AudioBand.AudioSource;
 using iTunesLib;
 using Timer = System.Timers.Timer;
 
@@ -14,6 +15,8 @@ namespace iTunesAudioSource
         private iTunesApp _itunesApp;
         private Timer _checkProcessTimer;
         private bool _itunesOpened;
+
+        public IAudioSourceLogger Logger { get; set; }
 
         public ITunesControls()
         {
@@ -106,7 +109,10 @@ namespace iTunesAudioSource
             {
                 _itunesApp.Play();
             }
-            catch (COMException) { }
+            catch (COMException e)
+            {
+                Logger?.Debug(e);
+            }
         }
 
         public void Pause()
@@ -115,7 +121,10 @@ namespace iTunesAudioSource
             {
                 _itunesApp.Pause();
             }
-            catch (COMException) { }
+            catch (COMException e)
+            {
+                Logger?.Debug(e);
+            }
         }
 
         public void Next()
@@ -124,7 +133,10 @@ namespace iTunesAudioSource
             {
                 _itunesApp.NextTrack();
             }
-            catch (COMException) { }
+            catch (COMException e)
+            {
+                Logger?.Debug(e);
+            }
         }
 
         public void Previous()
@@ -133,7 +145,10 @@ namespace iTunesAudioSource
             {
                 _itunesApp.PreviousTrack();
             }
-            catch (COMException) { }
+            catch (COMException e)
+            {
+                Logger?.Debug(e);
+            }
         }
 
         public bool GetLike()
