@@ -11,6 +11,7 @@ namespace AudioBand.TextFormatting
     public abstract class TextPlaceholder
     {
         private readonly HashSet<string> _propertyFilter = new HashSet<string>();
+        private readonly Dictionary<string, string> _parameters = new Dictionary<string, string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TextPlaceholder"/> class.
@@ -22,7 +23,13 @@ namespace AudioBand.TextFormatting
             Session = audioSession;
             Session.PropertyChanged += AudioSessionOnPropertyChanged;
 
-            // TODO parameters
+            if (parameters != null)
+            {
+                foreach (var p in parameters)
+                {
+                    _parameters[p.Name] = p.Value;
+                }
+            }
         }
 
         /// <summary>
@@ -56,6 +63,11 @@ namespace AudioBand.TextFormatting
         /// <returns>The value of the parameter or null if not passed in.</returns>
         protected string GetParameter(string parameterName)
         {
+            if (_parameters.TryGetValue(parameterName, out var value))
+            {
+                return value;
+            }
+
             return null;
         }
 
