@@ -71,8 +71,18 @@ namespace iTunesAudioSource
         /// <inheritdoc/>
         public string WindowClassName => "iTunes";
 
+        private IAudioSourceLogger _logger;
+
         /// <inheritdoc/>
-        public IAudioSourceLogger Logger { get; set; }
+        public IAudioSourceLogger Logger
+        {
+            get => _logger;
+            set
+            {
+                _logger = value;
+                _itunesControls.Logger = value;
+            }
+        }
 
         /// <inheritdoc/>
         public Task ActivateAsync()
