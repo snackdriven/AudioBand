@@ -342,7 +342,7 @@ namespace SpotifyAudioSource
         }
 
         /// <inheritdoc />
-        public Task DeactivateAsync()
+        public async Task DeactivateAsync()
         {
             _isActive = false;
             _authIsInProcess = false;
@@ -351,7 +351,7 @@ namespace SpotifyAudioSource
             _currentItemId = null;
             _currentTrackName = null;
             _currentItemIsTrack = false;
-            StopAuthServer();
+            await StopAuthServerAsync().ConfigureAwait(false);
             Logger.Debug("Spotify has been deactivated.");
 
             return Task.CompletedTask;
@@ -1038,7 +1038,7 @@ namespace SpotifyAudioSource
             Logger.Debug($"Received new access token. Expires in: {expiresIn} (At {DateTime.Now + expiresIn})");
         }
 
-        private void StopAuthServer()
+        private async Task StopAuthServerAsync()
         {
             if (_server == null)
             {
@@ -1049,7 +1049,7 @@ namespace SpotifyAudioSource
             {
                 _server.AuthorizationCodeReceived -= OnAuthorizationCodeReceived;
                 _server.ErrorReceived -= OnErrorReceived;
-                _server.Stop().GetAwaiter().GetResult();
+                await _server.Stop().ConfigureAwait(false);
                 _server.Dispose();
             }
             catch (Exception e)
@@ -1071,7 +1071,7 @@ namespace SpotifyAudioSource
 
             _lastAuthTime = DateTime.UtcNow;
             _authIsInProcess = true;
-            StopAuthServer();
+            await StopAuthServerAsync().ConfigureAwait(false);
             _server = new EmbedIOAuthServer(new Uri($"http://127.0.0.1:{LocalPort}/callback"), LocalPort);
             await _server.Start();
 
