@@ -106,6 +106,7 @@
     <Compile Include="ViewModels\GeneralSettingsViewModelTests.cs" />
     <Compile Include="ViewModels\CustomLabelsViewModelTests.cs" />
     <Compile Include="Settings\SettingsMigrationTests.cs" />
+    <Compile Include="Settings\ProfileJsonSafetyTests.cs" />
     <Compile Include="ViewModels\AudioSourceSettingsCollectionTests.cs" />
     <Compile Include="ViewModels\CustomLabelViewModelTests.cs" />
     <Compile Include="ViewModels\SettingsWindowViewModelTests.cs" />
