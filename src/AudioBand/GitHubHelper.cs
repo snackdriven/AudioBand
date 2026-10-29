@@ -28,13 +28,10 @@ namespace AudioBand
         private const string ReleaseOwner = "snackdriven";
         private const string ReleaseRepository = "AudioBand";
         private const string CommunityProfilesRepository = "CommunityProfiles";
-        private const string CommunityAudiosourcesRepository = "CommunityAudiosources";
 
         private static readonly ILogger Logger = AudioBandLogManager.GetLogger<GitHubHelper>();
         private readonly string _assetsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AudioBand", "Assets");
 
-        private RepositoryContent[] _communityProfiles;
-        private RepositoryContent[] _communityAudiosources;
 
         private IAppSettings _appSettings;
         private GitHubClient _client = new GitHubClient(new ProductHeaderValue(OrganizationName));
@@ -146,23 +143,9 @@ namespace AudioBand
         /// Gets the Community Audiosources found on the repository.
         /// </summary>
         /// <returns>An array of the Community Audiosources.</returns>
-        public async Task<CommunityAudiosource[]> GetCommunityAudiosourcesAsync()
+        public Task<CommunityAudiosource[]> GetCommunityAudiosourcesAsync()
         {
-            return null;
-            var profiles = new List<CommunityAudiosource>();
-
-            // for each profile
-            for (int i = 0; i < _communityProfiles.Length; i++)
-            {
-                var path = _communityProfiles[i].Path;
-                var subContents = await _client.Repository.Content.GetAllContents("AudioBand", CommunityAudiosourcesRepository, path);
-
-                var downloadSize = _communityProfiles[i].Size;
-
-                profiles.Add(new CommunityAudiosource($"Audiosource {i}", "A description.", "someone", false, downloadSize));
-            }
-
-            return profiles.ToArray();
+            return Task.FromResult<CommunityAudiosource[]>(null);
         }
 
         /// <summary>
