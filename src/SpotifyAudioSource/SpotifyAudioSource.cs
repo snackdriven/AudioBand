@@ -681,7 +681,11 @@ namespace SpotifyAudioSource
             {
                 _checkSpotifyTimer.Interval = e.RetryAfter.TotalMilliseconds < 100 ? 100 : e.RetryAfter.TotalMilliseconds;
             }
-            catch (TaskCanceledException e) { }
+            catch (TaskCanceledException e)
+            {
+                // Expected during task cancellation/shutdown.
+                Logger.Debug($"Task was canceled: {e.Message}");
+            }
             catch (APIException e)
             {
                 Logger.Error(e.Response.Body);
