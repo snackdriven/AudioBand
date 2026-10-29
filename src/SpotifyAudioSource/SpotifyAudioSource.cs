@@ -127,7 +127,7 @@ namespace SpotifyAudioSource
                 }
 
                 _clientId = value;
-                Authorize();
+                _ = AuthorizeAsync();
             }
         }
 
@@ -151,7 +151,7 @@ namespace SpotifyAudioSource
                 }
 
                 _clientSecret = value;
-                Authorize();
+                _ = AuthorizeAsync();
             }
         }
 
@@ -172,7 +172,7 @@ namespace SpotifyAudioSource
                 _forceRefreshAuth = false;
 
                 RefreshToken = "";
-                Authorize();
+                _ = AuthorizeAsync();
                 OnSettingChanged("Force Refresh Authentication");
             }
         }
@@ -335,7 +335,7 @@ namespace SpotifyAudioSource
             _isActive = true;
             _authIsInProcess = false;
 
-            Authorize();
+            await AuthorizeAsync();
             await UpdatePlayer();
 
             _checkSpotifyTimer.Start();
@@ -437,7 +437,7 @@ namespace SpotifyAudioSource
         {
             if (_spotifyClient == null)
             {
-                Authorize();
+                await AuthorizeAsync();
                 return;
             }
 
@@ -468,7 +468,7 @@ namespace SpotifyAudioSource
         {
             if (_spotifyClient == null)
             {
-                Authorize();
+                await AuthorizeAsync();
                 return;
             }
 
@@ -483,7 +483,7 @@ namespace SpotifyAudioSource
         {
             if (_spotifyClient == null)
             {
-                Authorize();
+                await AuthorizeAsync();
                 return;
             }
 
@@ -498,7 +498,7 @@ namespace SpotifyAudioSource
         {
             if (_spotifyClient == null)
             {
-                Authorize();
+                await AuthorizeAsync();
                 return;
             }
 
@@ -513,7 +513,7 @@ namespace SpotifyAudioSource
         {
             if (_spotifyClient == null)
             {
-                Authorize();
+                await AuthorizeAsync();
                 return;
             }
 
@@ -585,7 +585,7 @@ namespace SpotifyAudioSource
             }
         }
 
-        private void Authorize()
+        private async Task AuthorizeAsync()
         {
             if (!_isActive)
             {
@@ -601,13 +601,13 @@ namespace SpotifyAudioSource
             if (!string.IsNullOrEmpty(RefreshToken))
             {
                 Logger.Debug("Using RefreshToken from previous auth to connect to Spotify.");
-                RefreshAccessTokenOnClient().GetAwaiter().GetResult();
+                await RefreshAccessTokenOnClient();
                 return;
             }
 
             try
             {
-                FirstTimeAuth().GetAwaiter().GetResult();
+                await FirstTimeAuth();
             }
             catch (Exception e)
             {
@@ -657,7 +657,7 @@ namespace SpotifyAudioSource
                 {
                     if (!_authIsInProcess)
                     {
-                        Authorize();
+                        await AuthorizeAsync();
                     }
 
                     return null;
@@ -675,7 +675,7 @@ namespace SpotifyAudioSource
             }
             catch (APIUnauthorizedException)
             {
-                Authorize();
+                await AuthorizeAsync();
             }
             catch (APITooManyRequestsException e)
             {
