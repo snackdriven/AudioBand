@@ -236,7 +236,7 @@ namespace AudioBand.UI
                     await _gitHub.DownloadProfileAssetsAsync(communityProfile);
                 }
 
-                var profile = JsonConvert.DeserializeObject<UserProfile>(json);
+                var profile = JsonConvert.DeserializeObject<UserProfile>(json, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.None });
                 _appSettings.CreateProfile(profile);
 
                 communityProfile.IsInstalled = true;

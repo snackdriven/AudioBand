@@ -118,7 +118,7 @@ namespace AudioBand
                 }
 
                 // no need to replace the %AssetsFolder% placeholder
-                var profiles = JsonConvert.DeserializeObject<CommunityProfile[]>(json);
+                var profiles = JsonConvert.DeserializeObject<CommunityProfile[]>(json, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.None });
                 profiles = profiles?.OrderBy(x => x.Name).ToArray();
 
                 // check whether we have this profile installed

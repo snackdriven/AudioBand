@@ -26,6 +26,12 @@ namespace AudioBand.Settings.Persistence
         private static readonly ILogger Logger = AudioBandLogManager.GetLogger<PersistentSettings>();
         private bool _isBusy = false;
 
+        private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.None,
+            Formatting = Formatting.Indented
+        };
+
         private static readonly Dictionary<string, Type> SettingsTypeTable = new Dictionary<string, Type>()
         {
             { "0.1", typeof(Models.V1.AudioBandSettings) },
@@ -85,7 +91,7 @@ namespace AudioBand.Settings.Persistence
             try
             {
                 content = File.ReadAllText(SettingsFilePath);
-                var settings = JsonConvert.DeserializeObject<Settings>(content);
+                var settings = JsonConvert.DeserializeObject<Settings>(content, SerializerSettings);
 
                 if (settings == null)
                 {
@@ -119,7 +125,7 @@ namespace AudioBand.Settings.Persistence
             try
             {
                 _isBusy = true;
-                var json = JsonConvert.SerializeObject(settings, Formatting.Indented);
+                var json = JsonConvert.SerializeObject(settings, SerializerSettings);
                 File.WriteAllText(SettingsFilePath, json);
             }
             catch (Exception e)
@@ -139,7 +145,7 @@ namespace AudioBand.Settings.Persistence
             try
             {
                 var json = File.ReadAllText(path);
-                return JsonConvert.DeserializeObject<UserProfile>(json);
+                return JsonConvert.DeserializeObject<UserProfile>(json, SerializerSettings);
             }
             catch (Exception)
             {
@@ -166,7 +172,7 @@ namespace AudioBand.Settings.Persistence
                 try
                 {
                     var json = File.ReadAllText(fileNames[i]);
-                    var loadedProfile = JsonConvert.DeserializeObject<UserProfile>(json);
+                    var loadedProfile = JsonConvert.DeserializeObject<UserProfile>(json, SerializerSettings);
 
                     if (loadedProfile == null)
                     {
@@ -213,7 +219,7 @@ namespace AudioBand.Settings.Persistence
                 {
                     try
                     {
-                        var json = JsonConvert.SerializeObject(profiles[i], Formatting.Indented);
+                        var json = JsonConvert.SerializeObject(profiles[i], SerializerSettings);
                         var path = Path.Combine(ProfilesDirectory, $"{profiles[i].Name}.profile.json");
 
                         File.WriteAllText(path, json);
