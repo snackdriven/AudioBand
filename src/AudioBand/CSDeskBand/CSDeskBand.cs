@@ -248,27 +248,20 @@ namespace CSDeskBand
         public int InvokeCommand(IntPtr pici)
         {
             var commandInfo = Marshal.PtrToStructure<CMINVOKECOMMANDINFO>(pici);
-#pragma warning disable CS0219 // Variable is assigned but its value is never used
-            var isUnicode = false;
-            var isExtended = false;
-#pragma warning restore CS0219 // Variable is assigned but its value is never used
             var verbPtr = commandInfo.lpVerb;
 
             if (commandInfo.cbSize == Marshal.SizeOf<CMINVOKECOMMANDINFOEX>())
             {
-                isExtended = true;
-
                 var extended = Marshal.PtrToStructure<CMINVOKECOMMANDINFOEX>(pici);
                 if (extended.fMask.HasFlag(CMINVOKECOMMANDINFOEX.CMIC.CMIC_MASK_UNICODE))
                 {
-                    isUnicode = true;
                     verbPtr = extended.lpVerbW;
                 }
             }
 
             if (User32.HiWord(commandInfo.lpVerb.ToInt32()) != 0)
             {
-                // TODO verbs
+                // String verbs are not supported by this deskband
                 return HRESULT.E_FAIL;
             }
 
