@@ -354,7 +354,7 @@ namespace SpotifyAudioSource
             await StopAuthServerAsync().ConfigureAwait(false);
             Logger.Debug("Spotify has been deactivated.");
 
-            return Task.CompletedTask;
+
         }
 
         /// <inheritdoc />
