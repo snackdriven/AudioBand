@@ -266,7 +266,16 @@ namespace AudioBand.UI
 
         private void OpenLinkCommandOnExecute(string link)
         {
-            Process.Start(link);
+            if (Uri.TryCreate(link, UriKind.Absolute, out var uriResult) &&
+                (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps))
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName = link,
+                    UseShellExecute = true
+                };
+                Process.Start(psi);
+            }
         }
     }
 }
