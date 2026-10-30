@@ -114,6 +114,7 @@
     <Compile Include="ViewModels\ButtonViewModels.cs" />
     <Compile Include="ViewModels\ProgressBarViewModelTests.cs" />
     <Compile Include="ViewModels\ViewModelBaseTests.cs" />
+    <Compile Include="Logging\AudioBandExceptionLayoutRendererTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -127,6 +128,7 @@
       <Project>{b69832ad-8373-47ac-a52a-183238903896}</Project>
       <Name>AudioBand</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AudioBand.Logging\AudioBand.Logging.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Moq">
