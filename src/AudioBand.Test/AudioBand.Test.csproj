@@ -114,6 +114,7 @@
     <Compile Include="ViewModels\ButtonViewModels.cs" />
     <Compile Include="ViewModels\ProgressBarViewModelTests.cs" />
     <Compile Include="ViewModels\ViewModelBaseTests.cs" />
+    <Compile Include="Commands\RelayCommandTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
