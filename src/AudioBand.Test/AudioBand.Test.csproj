@@ -92,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BugFixRegressionTests.cs" />
+    <Compile Include="AudioSourceHost\AudioSourceLoggerTests.cs" />
     <Compile Include="ValueConverters\BoolToVisibilityConverterTests.cs" />
     <Compile Include="ValueConverters\ColorToBrushConverterTests.cs" />
     <Compile Include="ValueConverters\FlagToBoolConverterTests.cs" />
