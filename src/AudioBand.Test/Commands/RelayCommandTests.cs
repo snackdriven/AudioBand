@@ -63,7 +63,7 @@ namespace AudioBand.Test.Commands
         [Fact]
         public void Constructor_NullExecute_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new RelayCommand(null));
+            Assert.Throws<ArgumentNullException>(() => new RelayCommand((Action)null));
             Assert.Throws<ArgumentNullException>(() => new RelayCommand<int>(null));
         }
 
