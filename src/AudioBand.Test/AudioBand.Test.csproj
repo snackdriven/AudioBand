@@ -113,6 +113,8 @@
     <Compile Include="TextFormatting\CustomTextParsingTests.cs" />
     <Compile Include="TextFormatting\TextPlaceholderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AudioSourceHost\MarshaledEventHandlerTests.cs" />
+    <Compile Include="AudioSourceHost\MarshaledEventHandlerGenericTests.cs" />
     <Compile Include="ViewModels\ButtonViewModels.cs" />
     <Compile Include="ViewModels\ProgressBarViewModelTests.cs" />
     <Compile Include="ViewModels\ViewModelBaseTests.cs" />
@@ -128,6 +130,10 @@
     <ProjectReference Include="..\AudioBand\AudioBand.csproj">
       <Project>{b69832ad-8373-47ac-a52a-183238903896}</Project>
       <Name>AudioBand</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AudioSourceHost\AudioSourceHost.csproj">
+      <Project>{D3F92C3E-E546-4A6B-ADA2-FACD95E229F7}</Project>
+      <Name>AudioSourceHost</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
