@@ -22,7 +22,7 @@ namespace AudioBand.Test.Logging
         [Fact]
         public void Render_ExceptionIsNotNull_ReturnsFormattedString()
         {
-            var renderer = new AudioBandExceptionLayoutRenderer();
+            var renderer = new AudioBandExceptionLayoutRenderer { Format = "tostring" };
             var exception = new Exception("Test exception message");
             var logEvent = new LogEventInfo { Exception = exception };
 
