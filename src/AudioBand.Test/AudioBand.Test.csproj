@@ -110,6 +110,7 @@
     <Compile Include="ViewModels\CustomLabelViewModelTests.cs" />
     <Compile Include="ViewModels\SettingsWindowViewModelTests.cs" />
     <Compile Include="TextFormatting\CustomTextParsingTests.cs" />
+    <Compile Include="TextFormatting\TextPlaceholderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\ButtonViewModels.cs" />
     <Compile Include="ViewModels\ProgressBarViewModelTests.cs" />
