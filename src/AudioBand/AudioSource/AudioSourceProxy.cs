@@ -123,7 +123,7 @@ namespace AudioBand.AudioSource
         }
 
         /// <inheritdoc/>
-        public IAudioSourceLogger Logger { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IAudioSourceLogger Logger { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the audio source is currently playing.
